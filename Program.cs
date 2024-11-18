@@ -1,5 +1,6 @@
 using JoseEstrella_AP1_p2.Components;
 using JoseEstrella_AP1_p2.DAL;
+using JoseEstrella_AP1_p2.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 builder.Services.AddBlazorBootstrap();
+
+builder.Services.AddScoped<Servicio>();
 
 var app = builder.Build();
 

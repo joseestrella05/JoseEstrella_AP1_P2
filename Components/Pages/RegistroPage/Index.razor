@@ -1,0 +1,105 @@
+﻿@page "/Index/Registro"
+@rendermode InteractiveServer
+@inject Servicio Servicio
+@inject NavigationManager navigationManager
+
+<PageTitle>Index</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h5 class="card-title">Registro </h5>
+            <a href="/Cobros/Create" class="btn btn-primary "> <span class="bi bi-plus-square mt-3"></span> Crear</a>
+
+        </div>
+
+        <div class="card-body">
+            @*labels*@
+            <div class="row">
+                @*Filtrar por*@
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @*ValorFiltro*@
+                <div class="col-4">
+                    <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+                </div>
+            </div>
+
+            @*Inputs y botones*@
+            <div class="row align-items-center">
+                @*filtro*@
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opci&oacute;n</option>
+                        <option value="Deudor">Deudor</option>
+                    </InputSelect>
+                </div>
+
+                @*Busqueda*@
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-bordered text-center">
+                <thead class="table  table-striped text-black">
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Ver</th>
+                        <th>Modificar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var Registro in Lista )
+                    {
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-center">
+                                <a href="/Registro/Details/" class="btn btn-outline-primary bi bi-eye "></a>
+                            </td>
+                            <td class="text-center">
+                                <a href="/Registro/Edit/" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                            </td>
+                            <td class="text-center">
+                                <a href="/Registro/Delete/" class="btn btn-outline-danger bi bi-trash"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @*<div class="card-footer space-between">
+            <label>Cantidad: .Count()</label>
+            <label>Total: .Sum(p => p.Monto)</label>
+        </div>
+        *@
+    </div>
+</div>
+
+@code {
+    public List<Registro> Lista { get; set; } = new List<Registro>();
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    private async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "")
+            {
+                
+            }
+        }
+        
+            
+    }
+}
