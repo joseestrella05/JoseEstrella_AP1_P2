@@ -1,6 +1,18 @@
 ﻿@page "/Registro/Create"
 @inject ComboService comboService
 
+<PageTitle>Create</PageTitle>
+<EditForm Model="Combo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+</EditForm>
 @code {
+    public List<Combos> combos { get; set; } = new List<Combos>();
+    public Combos Combo { get; set; } = new Combos();
 
+
+    public async Task Guardar()
+    {
+        
+    }
 }
