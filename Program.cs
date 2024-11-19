@@ -13,7 +13,10 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 builder.Services.AddBlazorBootstrap();
 
-builder.Services.AddScoped<Servicio>();
+builder.Services.AddScoped<ArticuloService>();
+builder.Services.AddScoped<ComboDetalleService>();
+builder.Services.AddScoped<ComboService>();
+
 
 var app = builder.Build();
 

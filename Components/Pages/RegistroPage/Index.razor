@@ -1,6 +1,6 @@
 ﻿@page "/Index/Registro"
 @rendermode InteractiveServer
-@inject Servicio Servicio
+@inject ComboService comboService
 @inject NavigationManager navigationManager
 
 <PageTitle>Index</PageTitle>
@@ -8,7 +8,7 @@
     <div class="card shadow-lg">
         <div class="card-header space-between">
             <h5 class="card-title">Registro </h5>
-            <a href="/Cobros/Create" class="btn btn-primary "> <span class="bi bi-plus-square mt-3"></span> Crear</a>
+            <a href="/Registro/Create" class="btn btn-primary "> <span class="bi bi-plus-square mt-3"></span> Crear</a>
 
         </div>
 
@@ -49,28 +49,32 @@
                 <thead class="table  table-striped text-black">
                     <tr>
                         <th>Id</th>
-                        <th>Nombre</th>
+                        <th>Fecha</th>
+                        <th>Descripcion</th>
+                        <th>Precio</th>
+                        <th>Vendido</th>
                         <th>Ver</th>
                         <th>Modificar</th>
                         <th>Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var Registro in Lista )
+                    @foreach (var combo in ListaCombo )
                     {
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td>@combo.ComboId</td>
+                            <td>@combo.Fecha</td>
+                            <td>@combo.Descripcion</td>
+                            <td>@combo.Precio</td>
+                            <td>@combo.vendido</td>
                             <td class="text-center">
-                                <a href="/Registro/Details/" class="btn btn-outline-primary bi bi-eye "></a>
+                                <a href="/Registro/Details/@combo.ComboId" class="btn btn-outline-primary bi bi-eye "></a>
                             </td>
                             <td class="text-center">
-                                <a href="/Registro/Edit/" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                                <a href="/Registro/Edit/@combo.ComboId" class="btn btn-outline-primary bi bi-pencil-square"></a>
                             </td>
                             <td class="text-center">
-                                <a href="/Registro/Delete/" class="btn btn-outline-danger bi bi-trash"></a>
+                                <a href="/Registro/Delete/@combo.ComboId" class="btn btn-outline-danger bi bi-trash"></a>
                             </td>
                         </tr>
                     }
@@ -86,10 +90,11 @@
 </div>
 
 @code {
-    public List<Registro> Lista { get; set; } = new List<Registro>();
+
+    public List<Combos> ListaCombo { get; set; } = new List<Combos>();
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
-
+ 
     private async Task Buscar()
     {
         if (ValorFiltro.Trim() != "")
