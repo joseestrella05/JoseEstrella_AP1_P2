@@ -14,7 +14,7 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
 
     }
 
-    public async Task<bool> Guardar(Combos Combo)
+    public async Task<bool> Guardar(Combo Combo)
     {
         if (!await Existe(Combo.ComboId))
         {
@@ -26,7 +26,7 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
         }
     }
 
-    public async Task<bool> Insertar(Combos combo)
+    public async Task<bool> Insertar(Combo combo)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         contexto.Combos.Add(combo);
@@ -35,7 +35,7 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
 
     }
 
-    public async Task<bool> Modificar(Combos combo)
+    public async Task<bool> Modificar(Combo combo)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         contexto.Update(combo);
@@ -46,20 +46,20 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         var combos = contexto.Combos.Find(id);
-        contexto.ComboDestalles.RemoveRange();
+        contexto.ComboDetalles.RemoveRange();
         contexto.Combos.Remove(combos);
         var cantidad = await contexto.SaveChangesAsync();
         return cantidad > 0;
     }
 
-    public async Task<Combos?> Buscar(int id)
+    public async Task<Combo?> Buscar(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Combos.Include(c => c.ComboId == id)
             .FirstOrDefaultAsync(c => c.ComboId == id);
     }
 
-    public async Task<List<Combos>> Listar(Expression<Func<Combos, bool>> criterio)
+    public async Task<List<Combo>> Listar(Expression<Func<Combo, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Combos.Include(a => a.ComboId)
@@ -69,4 +69,5 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
 
 
     }
+   
 }

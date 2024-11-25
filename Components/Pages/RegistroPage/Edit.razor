@@ -1,5 +1,154 @@
-﻿<h3>Edit</h3>
+﻿@page "/Combo/Edit/{ComboId:int}"
+@inject ToastService Toast
+@rendermode InteractiveServer
+@inject ComboService ComboService
+@inject ArticuloService ArticuloService
+@inject NavigationManager navigation
+
+<PageTitle>Crear combo</PageTitle>
+
+<EditForm Model="@Combo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h2>Crear nuevos combos</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <label>Fecha:</label>
+                    <DateInput class="form-control" @bind-Value="Combo.Fecha" />
+                    <ValidationMessage For="@(() => Combo.Fecha)" />
+                </div>
+
+                <div class="row">
+                    <label>Descripcion:</label>
+                    <InputText class="form-control" @bind-Value="Combo.Descripcion" />
+                    <ValidationMessage For="@(() => Combo.Descripcion)" />
+                </div>
+
+                 <div class="row">
+                    <label class="form-label">Precio </label>
+	                <InputNumber class="form-control" @bind-Value="@Combo.precio" placeholder="0.00$" readonly disabled></InputNumber>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><strong>¿Vendido?</strong></label>
+                    <InputCheckbox class="form-check-input" @bind-Value="@Combo.Vendido" />
+                </div>
+
+                <div class="border border-success p-3 mt-3">
+
+                    <PickerArticulos ListaArticulos="ListaArticulos"
+                                     ArticuloId="Detalles.ArticuloId"
+                                     Cantidad="Detalles.Cantidad"
+                                     precio="Detalles.Precio"
+                                     ArticuloSeleccionado="AgregarDetalle" />
+
+                    <table class="table table-hover text-center mt-3">
+                        <thead class="table  table-striped text-black ">
+                            <tr>
+                                <th><strong>Articulo Id</strong></th>
+                                <th><strong>Descripcion</strong></th>
+                                <th><strong>Cantidad</strong></th>
+                                <th><strong>Precio</strong></th>
+                                <th><strong>Opciones</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalles in Combo.Detalles)
+                            {
+                                <tr>
+                                    <td> @detalles.ArticuloId</td>
+                                    <td> @detalles.Articulo?.Descripcion</td>
+                                    <td> @detalles.Cantidad</td>
+                                    <td> @detalles.Precio</td>
+
+                                    <td class="text-center">
+                                        <button type="button" @onclick=" ()=> EliminarDetalle(detalles)" class="btn btn-danger bi bi-trash">Remover</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="Botones_agregar">
+                    <a href="/Combo/Index" class="btn btn-info bi bi-arrow-left-square "> Volver</a>
+                    <button type="submit" class="btn btn-success bi bi-floppy"> Guardar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</EditForm>
 
 @code {
+    [Parameter]
+    public int ComboId { get; set; }
+    public Combo Combo { get; set; } = new Combo();
+    public ComboDetalles Detalles { get; set; } = new ComboDetalles();
+    public List<Producto> ListaArticulos { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaArticulos = await ArticuloService.Listar(c => c.ProductoId > 0);
+        Combo = await ComboService.Buscar(ComboId); 
+
+    }
+
+    public async Task AgregarDetalle((Producto articulos, int cantidad) selection)
+    {
+        var ArticuloExiste = Combo.Detalles
+        .FirstOrDefault(A => A.ArticuloId == selection.articulos.ProductoId);
+        if (ArticuloExiste != null)
+        {
+            Toast.Notify(new(ToastType.Info, "Cantidad actualizada."));
+            ArticuloExiste.Cantidad += selection.cantidad;
+        }
+        else
+        {
+            var ArticuloDetalle = new ComboDetalles
+                {
+                    ArticuloId = selection.articulos.ProductoId,
+                    Cantidad = selection.cantidad,
+                    Precio = selection.articulos.Precio,
+                };
+            Combo.Detalles.Add(ArticuloDetalle);
+            Combo.precio += ArticuloDetalle.Precio * ArticuloDetalle.Cantidad;
+            Detalles = new ComboDetalles();
+            await Task.CompletedTask;
+            Toast.Notify(new(ToastType.Success, $"Se agrego el componente correctamente"));
+
+        }
+    }
+    public void EliminarDetalle(ComboDetalles detalles)
+    {
+        Combo.Detalles.Remove(detalles);
+        Detalles.Cantidad = detalles.Cantidad;
+        Detalles.ArticuloId = detalles.ArticuloId;
+        Detalles.Precio = detalles.Precio;
+        Toast.Notify(new(ToastType.Info, $"Se elimino el Componente "));
+    }
+
+    public async Task Guardar()
+    {
+        if (Combo.Detalles.Count.Equals(0))
+        {
+            Toast.Notify(new(ToastType.Danger, $"No se puede guardar un combo sin componentes."));
+            return;
+        }
+        Toast.Notify(new(ToastType.Success, $"Se guardo de forma correcta el combo"));
+        await ComboService.Guardar(Combo);
+        await Task.Delay(2000);
+        navigation.NavigateTo("/Combo/index");
+    }
+
 
 }

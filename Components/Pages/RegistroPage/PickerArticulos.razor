@@ -1,0 +1,60 @@
+﻿@inject ToastService Toast
+
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<div class="col-auto input-group align-items-center">
+
+	<InputSelect class="form-select" @bind-Value="ArticuloId">
+
+		<option disabled value="0">--- Seleccione un articulo ---</option>
+		@foreach (var articulos in ListaArticulos)
+		{
+			<option value="@articulos.ProductoId">@articulos.Descripcion -- Existencias (@articulos.Existencia) -- Precio (@articulos.Precio $)</option>
+		}
+
+	</InputSelect>
+
+	<label class="col-form-label input-group-text">Cantidad </label>
+	<InputNumber class="form-control" @bind-Value="Cantidad" placeholder="0.00$"></InputNumber>
+
+	<label class="col-form-label input-group-text">Precio </label>
+	<InputNumber class="form-control" @bind-Value="precio" placeholder="0.00$" readonly disabled></InputNumber>
+	<button type="button" class="btn btn-outline-success bi bi-plus mt-2" @onclick="ElegirArticulo">Agregar detalle</button>
+
+</div>
+
+
+@code {
+	[Parameter]
+	public List<Producto> ListaArticulos { get; set; } = [];
+
+	[Parameter]
+	public int ArticuloId { get; set; }
+
+	[Parameter]
+	public int Cantidad { get; set; }
+
+	[Parameter]
+	public double precio { get; set; }
+
+	[Parameter]
+	public EventCallback<(Producto articulo, int cantidad)> ArticuloSeleccionado { get; set; }
+
+	private async Task ElegirArticulo()
+	{
+		if (ArticuloId > 0 && Cantidad > 0)
+		{
+			var Articulo = ListaArticulos.Single(p => p.ProductoId == ArticuloId);
+			if (Articulo.Existencia < Cantidad)
+			{
+				Toast.Notify(new(ToastType.Danger, $"La cantidad agregada es mayor a la existencia del articulo"));
+				return;
+			}
+			await ArticuloSeleccionado.InvokeAsync((Articulo, Cantidad));
+		}
+		else
+		{
+			Toast.Notify(new(ToastType.Danger, $"Seleccione un articulo o Agregue una cantidad mayor a cero"));
+		}
+	}
+} 

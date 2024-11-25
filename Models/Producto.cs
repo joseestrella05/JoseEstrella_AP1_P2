@@ -2,19 +2,16 @@
 
 namespace JoseEstrella_AP1_p2.Models;
 
-public class Combos
+public class Producto
 {
     [Key]
-    public int ComboId { get; set; }
+    public int ProductoId { get; set; }
 
-    public DateTime Fecha { get; set; } = DateTime.Now;
+    public int Existencia { get; set; }
 
     public string Descripcion { get; set; }
 
     public double Precio { get; set; }
 
-    public int vendido {  get; set; }
-
-
-
+    public double Costo { get; set; }
 }

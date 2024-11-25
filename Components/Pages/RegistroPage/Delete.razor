@@ -1,5 +1,72 @@
-﻿<h3>Delete</h3>
+﻿@page "/Combo/Delete/{ComboId:int}"
+@rendermode InteractiveServer
+@inject ComboService ComboService
+@inject NavigationManager navigation
+@inject ToastService Toast
+
+<PageTitle>Detalles del trabajo</PageTitle>
+
+<div class="container">
+	<div class="Card shadow-lg">
+		<div class="card-header">
+			<h2 class="card-title">Eliminar Combo</h2>
+		</div>
+		<div class="card-body">
+			<ul>
+				<li><strong>Combo Id:</strong> @Combo.ComboId</li>
+				<li><strong>Descripci&oacute;n del Combo:</strong> @Combo.Descripcion</li>
+				<li><strong>fecha de solicitud:</strong> @Combo.Fecha.ToString("dd/MM/yyyy")</li>
+				<li><strong>Estado:</strong> @Combo.Vendido</li>
+			</ul>
+			<div>
+				<table class="table table-hover text-center mt-3">
+					<thead class="table  table-striped text-black ">
+						<tr>
+							<th><strong>Articulo Id</strong></th>
+							<th><strong>Cantidad</strong></th>
+							<th><strong>Precio</strong></th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var detalles in Combo.Detalles)
+						{
+							<tr>
+								<td> @detalles.ArticuloId</td>
+								<td> @detalles.Cantidad</td>
+								<td> @detalles.Precio</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="card-footer">
+			<div class="alert alert-danger">
+				<label>¿Seguro que desea eliminar a este Combo?</label>
+			</div>
+			<a href="/Combo/index" class="btn btn-info bi bi-arrow-left-square"> Volver</a>
+			<button type="button" @onclick="eliminar" class="btn btn-outline-danger bi bi-trash"> Eliminar Combo</button>
+		</div>
+
+	</div>
+</div>
 
 @code {
+	[Parameter]
+	public int ComboId { get; set; }
+	Combo Combo { get; set; } = new Combo();
+
+	protected override async Task OnInitializedAsync()
+	{
+		Combo = await ComboService.Buscar(ComboId);
+	}
+
+	public async Task eliminar()
+	{
+		Toast.Notify(new(ToastType.Success, $"Se elimino el combo de forma correcta"));
+		await ComboService.Eliminar(Combo.ComboId);
+		await Task.Delay(2000);
+		navigation.NavigateTo("/Combo/index");
+	}
 
 }

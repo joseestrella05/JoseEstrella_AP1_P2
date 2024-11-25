@@ -8,15 +8,14 @@ namespace JoseEstrella_AP1_p2.Services;
 
 public class ArticuloService(IDbContextFactory<Contexto> DbFactory)
 {
-     public async Task<List<Articulos>> Listar(Expression<Func<Articulos, bool>> criterio)
-     {
-         await using var contexto = await DbFactory.CreateDbContextAsync();
-         return await contexto.Articulos.Include(a=> a.ArticuloId)
-            .Where(criterio)
+    public async Task<List<Producto>> Listar(Expression<Func<Producto, bool>> criterio)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Productos
             .AsNoTracking()
+            .Where(criterio)
             .ToListAsync();
+    }
+} 
 
 
-     } 
-
-}

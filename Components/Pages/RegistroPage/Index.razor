@@ -1,110 +1,148 @@
-﻿@page "/Index/Registro"
-@rendermode InteractiveServer
-@inject ComboService comboService
+﻿@page "/Combo/Index"
 @inject NavigationManager navigationManager
+@rendermode InteractiveServer
+@inject ComboService ComboService
 
-<PageTitle>Index</PageTitle>
+
 <div class="container">
     <div class="card shadow-lg">
         <div class="card-header space-between">
-            <h5 class="card-title">Registro </h5>
-            <a href="/Registro/Create" class="btn btn-primary "> <span class="bi bi-plus-square mt-3"></span> Crear</a>
-
+            <h5 class="card-title">Registro Combos</h5>
+            <a href="/Combo/Create" class="btn btn-primary">
+                <span class="bi bi-plus-square mt-3"></span> Crear
+            </a>
         </div>
 
         <div class="card-body">
-            @*labels*@
+
             <div class="row">
-                @*Filtrar por*@
+
                 <div class="col-3">
                     <label class="col-form-label"><strong>Filtrar por</strong></label>
                 </div>
 
-                @*ValorFiltro*@
                 <div class="col-4">
                     <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
                 </div>
+
             </div>
 
-            @*Inputs y botones*@
             <div class="row align-items-center">
-                @*filtro*@
                 <div class="col-3">
                     <InputSelect class="form-select" @bind-Value="Filtro">
                         <option value="" selected disabled>Elija una opci&oacute;n</option>
-                        <option value="Deudor">Deudor</option>
+                        <option value="descripcion">Descripcion</option>
+                        <option value="Fecha">Fecha</option>
                     </InputSelect>
                 </div>
 
-                @*Busqueda*@
                 <div class="col-4">
                     <div class="input-group">
                         <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
                         <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
                     </div>
                 </div>
+
+
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise"
+                    @onclick="Restablecer">
+                    </button>
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-3">
+                        <label class="col-form-label"><strong>Desde</strong></label>
+                        <InputDate class="form-control" @bind-Value="Desde"></InputDate>
+                    </div>
+
+                    <div class="col-3">
+                        <label class="col-form-label"><strong>Hasta</strong></label>
+                        <div class="input-group">
+                            <InputDate class="form-control" @bind-Value="Hasta"></InputDate>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
-            <table class="table table-hover table-bordered text-center">
-                <thead class="table  table-striped text-black">
+            <table class="table table-hover text-center mt-3">
+                <thead class="table  table-striped text-black ">
                     <tr>
-                        <th>Id</th>
-                        <th>Fecha</th>
-                        <th>Descripcion</th>
-                        <th>Precio</th>
-                        <th>Vendido</th>
-                        <th>Ver</th>
-                        <th>Modificar</th>
-                        <th>Eliminar</th>
+                        <th><strong>ComboId</strong></th>
+                        <th><strong>Descripcion</strong></th>
+                        <th><strong>Fecha</strong></th>
+                        <th><strong>Precio</strong></th>
+                        <th><strong>Vendido</strong></th>
+                        <th><strong>Opciones</strong></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var combo in ListaCombo )
+                    @foreach (var combo in ListaCombos)
                     {
                         <tr>
-                            <td>@combo.ComboId</td>
-                            <td>@combo.Fecha</td>
-                            <td>@combo.Descripcion</td>
-                            <td>@combo.Precio</td>
-                            <td>@combo.vendido</td>
+                            <td> @combo.ComboId</td>
+                            <td> @combo.Descripcion</td>
+                            <td> @combo.Fecha</td>
+                            <td> @combo.precio.ToString("N2") $</td>
+                            <td> @combo.Vendido.ToString()</td>
+
+
                             <td class="text-center">
-                                <a href="/Registro/Details/@combo.ComboId" class="btn btn-outline-primary bi bi-eye "></a>
-                            </td>
-                            <td class="text-center">
-                                <a href="/Registro/Edit/@combo.ComboId" class="btn btn-outline-primary bi bi-pencil-square"></a>
-                            </td>
-                            <td class="text-center">
-                                <a href="/Registro/Delete/@combo.ComboId" class="btn btn-outline-danger bi bi-trash"></a>
+                                <a href="/Combo/Edit/@combo.ComboId"
+                                class="btn btn-outline-primary bi bi-pencil-square"></a>
+                                <a href="/Combo/Delete/@combo.ComboId" class="btn btn-outline-danger bi bi-trash"></a>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-        @*<div class="card-footer space-between">
-            <label>Cantidad: .Count()</label>
-            <label>Total: .Sum(p => p.Monto)</label>
+        <div class="card-footer space-between">
+            <label class="ms-3"><strong>Cantidad:</strong> @ListaCombos.Count</label>
+            <div class="col-5">
+            </div>
         </div>
-        *@
     </div>
 </div>
 
 @code {
+    public List<Combo> ListaCombos { get; set; } = new List<Combo>();
 
-    public List<Combos> ListaCombo { get; set; } = new List<Combos>();
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
- 
+
+    public DateTime? Desde { get; set; } = null;
+
+    public DateTime? Hasta { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCombos = await ComboService.Listar(c => c.ComboId > 0);
+       
+    }
     private async Task Buscar()
     {
-        if (ValorFiltro.Trim() != "")
+        if (Filtro == "fecha")
+            ListaCombos = await ComboService
+            .Listar(f => f.Fecha >= Desde && f.Fecha <= Hasta);
+
+        else if (ValorFiltro.Trim() != "" && Filtro == "descripcion")
         {
-            if (Filtro == "")
-            {
-                
-            }
+            ListaCombos = await ComboService
+            .Listar(p => p.Descripcion.ToLower()
+            .Contains(ValorFiltro.ToLower()));
         }
-        
-            
     }
+    private async Task Restablecer()
+    {
+        ListaCombos = await ComboService.Listar(e => e.ComboId > 0);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+        Desde = null;
+        Hasta = null;
+    }
+
 }
