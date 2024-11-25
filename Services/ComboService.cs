@@ -62,12 +62,13 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
     public async Task<List<Combo>> Listar(Expression<Func<Combo, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Combos.Include(a => a.ComboId)
-           .Where(criterio)
-           .AsNoTracking()
-           .ToListAsync();
+        return await contexto.Combos
+        .Where(criterio)
+        .AsNoTracking()
+        .ToListAsync();
+
 
 
     }
-   
+
 }
